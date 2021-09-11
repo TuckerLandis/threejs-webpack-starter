@@ -44,8 +44,8 @@ scene.add(pointLight)
 // light 2
 
 const pointLight2 = new THREE.PointLight(0xff0000, 2)
-pointLight2.position.set(1,8,1)
-pointLight2.intensity = 10
+pointLight2.position.set(-1.72, 8,1)
+pointLight2.intensity = 3
 scene.add(pointLight2)
 
 const light1 = gui.addFolder('Light 1')
@@ -55,8 +55,8 @@ light1.add(pointLight2.position, 'x').min(-6).max(6).step(0.01);
 light1.add(pointLight2.position, 'z').min(-3).max(3).step(0.01);
 light1.add(pointLight2, 'intensity').min(0).max(10).step(0.01);
 
-const pointLightHelper = new THREE.PointLightHelper(pointLight2, 1)
-scene.add(pointLightHelper)
+// const pointLightHelper = new THREE.PointLightHelper(pointLight2, 1)
+// scene.add(pointLightHelper)
 
 
 // light three
@@ -73,8 +73,19 @@ light2.add(pointLight3.position, 'x').min(-6).max(6).step(0.01);
 light2.add(pointLight3.position, 'z').min(-3).max(3).step(0.01);
 light2.add(pointLight3, 'intensity').min(0).max(10).step(0.01);
 
-const pointLightHelper3 = new THREE.PointLightHelper(pointLight3, 1)
-scene.add(pointLightHelper3)
+const light2Color = {
+    color: 0x9500ff
+}
+
+
+// in gui, when changing color, change light 3 color
+light2.addColor(light2Color, 'color')
+    .onChange(() => {
+        pointLight3.color.set(light2Color.color)
+    })
+
+// const pointLightHelper3 = new THREE.PointLightHelper(pointLight3, 1)
+// scene.add(pointLightHelper3)
 
 /**
  * Sizes
@@ -127,15 +138,41 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Animate
  */
 
+    document.addEventListener('mousemove', onDocumentMouseMove)
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    let targetX = 0;
+    let targetY = 0;
+
+    const windowX = window.innerWidth / 2;
+    const windowY = window.innerHeight / 2;
+    
+function onDocumentMouseMove(event) {
+    mouseX = (event.clientX - windowX)
+    mouseY = (event.clientY - windowY)
+}
+
+
+
 const clock = new THREE.Clock()
 
 const tick = () =>
 {
 
+    targetX = mouseX * .001
+    targetY = mouseY * .001
+
+
     const elapsedTime = clock.getElapsedTime()
 
     // Update objects
     sphere.rotation.y = .5 * elapsedTime
+
+    sphere.rotation.y += .5 * (targetX - sphere.rotation.y)
+    sphere.rotation.x += .05 * (targetY - sphere.rotation.x)
+    sphere.rotation.z += .05 * (targetY - sphere.rotation.x)
 
     // Update Orbital Controls
     // controls.update()
